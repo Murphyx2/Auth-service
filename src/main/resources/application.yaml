@@ -29,3 +29,7 @@ spring:
             require-authorization-consent: true
 server:
   port: 9000
+
+# The string should be longer, and It shouldn't be written here, this is just for dev purporse
+jwt:
+  signing-secret: secret

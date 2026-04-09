@@ -30,13 +30,4 @@ public class AuthApiController {
 		return authService.login(loginDto);
 	}
 
-	@PreAuthorize("isAuthenticated()")
-	@PostMapping("/logout")
-	public void logout(HttpServletRequest request) {
-		String token = Optional.ofNullable(request.getHeader(AuthConstants.AUTHORIZATION_HEADER))
-				.orElseThrow();
-
-		authService.logout(token);
-	}
-
 }

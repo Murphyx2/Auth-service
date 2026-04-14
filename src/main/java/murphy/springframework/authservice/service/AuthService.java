@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import murphy.springframework.authservice.common.Role;
 import murphy.springframework.authservice.dto.user.UserResponse;
 import murphy.springframework.authservice.dto.user.UserResponseWithCredentials;
+import murphy.springframework.authservice.exception.NotFoundException;
 import murphy.springframework.authservice.security.dto.LoginDto;
 import murphy.springframework.authservice.security.dto.TokenDto;
 import murphy.springframework.authservice.security.exception.ApplicationAuthenticationException;
@@ -38,8 +39,13 @@ public class AuthService {
 	}
 
 	public TokenDto login(LoginDto loginDto) {
-		UserResponseWithCredentials userCredentials = userService //
-				.getUserCredentialsByUsername(loginDto.username());
+		UserResponseWithCredentials userCredentials;
+		try {
+			userCredentials = userService //
+					.getUserCredentialsByUsername(loginDto.username());
+		} catch (NotFoundException e) {
+			userCredentials = userService.getUserCredentialsByUsernameInMemory(loginDto.username());
+		}
 
 		if(!passwordEncoder.matches(loginDto.password(), userCredentials.passwordHash())) {
 			throw new ApplicationAuthenticationException("Password is incorrect");

@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: Auth-service
+  security:
+    user:
+      name: user
+      password: password  # Demo credentials (replace in production)
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auth-db
+    username: myuser
+    password: mypassword
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+server:
+  port: 9000
+
+# The string should be longer, and It shouldn't be written here, this is just for dev purposes
+jwt:
+  signing-secret: secret

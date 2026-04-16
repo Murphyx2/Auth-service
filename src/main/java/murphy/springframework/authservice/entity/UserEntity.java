@@ -1,8 +1,11 @@
 package murphy.springframework.authservice.entity;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -10,6 +13,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import lombok.Data;
@@ -22,11 +26,16 @@ public class UserEntity {
 
 	@Id
 	@UuidGenerator
-	private String id;
+	@Column(nullable = false, updatable = false, columnDefinition = "uuid")
+	private UUID id;
 
-	@Column(unique = true)
+	@Column(unique = true, nullable = false, updatable = false)
 	private String username;
 
+	@Column(nullable = false, unique = true)
+	private String email;
+
+	@Column(nullable = false)
 	private String passwordHash;
 
 	private String firstName;
@@ -35,24 +44,38 @@ public class UserEntity {
 
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(fetch = FetchType.EAGER)
-	private Set<Role> roles;
+	@CollectionTable(
+			name = "user_entity_roles",
+			joinColumns = @JoinColumn(name = "user_entity_id")
+	)
+	private Set<Role> roles = new HashSet<>();
+
+	// Helper role methods
+	public void addRole(Role role) {
+		roles.add(role);
+	}
+
+	public void removeRole(Role role) {
+		roles.remove(role);
+	}
 
 	private Boolean active;
 
-	private ZonedDateTime createdDate;
+	private Instant createdDate;
 
-	private ZonedDateTime updatedDate;
+	private Instant updatedDate;
 
 	@PrePersist
 	public void onPrePersist() {
 
-		createdDate = ZonedDateTime.now();
-		updatedDate = ZonedDateTime.now();
+		createdDate = Instant.now();
+		updatedDate = Instant.now();
 	}
 
 	@PreUpdate
 	public void onPreUpdate() {
 
-		updatedDate = ZonedDateTime.now();
+		updatedDate = Instant.now();
 	}
+
 }

@@ -1,15 +1,19 @@
 package murphy.springframework.authservice.service;
 
+import java.util.Optional;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import lombok.val;
 import murphy.springframework.authservice.common.Role;
+import murphy.springframework.authservice.dto.user.UserCreateRequest;
 import murphy.springframework.authservice.dto.user.UserResponse;
 import murphy.springframework.authservice.dto.user.UserResponseWithCredentials;
 import murphy.springframework.authservice.entity.UserEntity;
 import murphy.springframework.authservice.exception.NotFoundException;
+import murphy.springframework.authservice.exception.UserAlreadyExistsException;
 import murphy.springframework.authservice.mapper.UserMapper;
 import murphy.springframework.authservice.repository.UserRepository;
 
@@ -28,6 +32,22 @@ public class UserService {
 		this.userDetailsService = userDetailsService;
 	}
 
+	public UserResponse createUser(UserCreateRequest createRequest) {
+
+		if(userRepository.findByUsername(createRequest.username()).isPresent() &&
+		userRepository.findByEmail(createRequest.email()).isPresent()) {
+			throw new UserAlreadyExistsException();
+		}
+
+		return userMapper //
+				.toResponse(userRepository //
+						.save(userMapper //
+								.userCreateRequestToUserEntity(createRequest) //
+						) //
+				);
+
+	}
+
 	public UserResponseWithCredentials getUserCredentialsByUsername(String username) {
 
 		UserEntity userEntity =
@@ -38,7 +58,7 @@ public class UserService {
 
 	public UserResponseWithCredentials getUserCredentialsByUsernameInMemory(String username) {
 		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-		var userResponse = new UserResponse("1", userDetails.getUsername(), "","",
+		var userResponse = new UserResponse("1", userDetails.getUsername(), "","", "",
 				userDetails.getAuthorities().stream().map(grantedAuthority ->
 						Role.valueOf(grantedAuthority.getAuthority()) //
 				).toList(), userDetails.isEnabled());

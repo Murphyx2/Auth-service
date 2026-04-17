@@ -9,5 +9,6 @@ public record UserResponse(
 		String username,
 		String firstname,
 		String lastname,
+		String email,
 		List<Role> roles,
 		Boolean active) {}

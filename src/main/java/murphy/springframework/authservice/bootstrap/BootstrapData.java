@@ -7,7 +7,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import murphy.springframework.authservice.common.Role;
 import murphy.springframework.authservice.entity.UserEntity;
@@ -21,7 +20,8 @@ public class BootstrapData implements CommandLineRunner {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 
-	private boolean bootstrapData = false;
+	@Value("${app.bootstrap.enabled}")
+	private boolean enableBootstrapData;
 
 	private void loadUsers() {
 		if (userRepository.count() == 0) {
@@ -47,7 +47,7 @@ public class BootstrapData implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		if(bootstrapData) {
+		if(enableBootstrapData) {
 			loadUsers();
 		}
 	}

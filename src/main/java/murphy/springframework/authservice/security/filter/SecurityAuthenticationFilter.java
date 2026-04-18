@@ -2,8 +2,10 @@ package murphy.springframework.authservice.security.filter;
 
 import java.io.IOException;
 
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -11,50 +13,37 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import murphy.springframework.authservice.common.AuthConstants;
-import murphy.springframework.authservice.security.authentication.UserAuthentication;
-import murphy.springframework.authservice.security.exception.TokenAuthenticationException;
-import murphy.springframework.authservice.security.service.jwt.JwtService;
-import murphy.springframework.authservice.security.user.AuthUser;
 
 @Component
 public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
-	private final JwtService jwtService;
+	private final AuthenticationManager authenticationManager;
 
-	public SecurityAuthenticationFilter(JwtService jwtService) {
-		this.jwtService = jwtService;
+	public SecurityAuthenticationFilter(AuthenticationManager authenticationManager) {
+		this.authenticationManager = authenticationManager;
 	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-		String authenticationHeader = request.getHeader(AuthConstants.AUTHORIZATION_HEADER);
+		Authentication unauthenticatedAuthentication = SecurityContextHolder //
+				.getContext() //
+				.getAuthentication();
 
-		if(authenticationHeader == null) {
-			// Authentication token is not present, let's rely on anonymous authentication
+		if (unauthenticatedAuthentication == null || unauthenticatedAuthentication.isAuthenticated()) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 
-		String token = stripBearerPrefix(authenticationHeader);
-		AuthUser authUser = jwtService.resolveJwtToken(token);
+		Authentication authenticatedAuthentication = authenticationManager //
+				.authenticate(unauthenticatedAuthentication);
 
-		UserAuthentication userAuthentication = new UserAuthentication(authUser);
-
-		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-		securityContext.setAuthentication(userAuthentication);
-		SecurityContextHolder.setContext(securityContext);
-
-		filterChain.doFilter(request, response);
-	}
-
-	String stripBearerPrefix(String token) {
-
-		if (!token.startsWith("Bearer")) {
-			throw new TokenAuthenticationException("Unsupported authentication scheme");
+		if(authenticatedAuthentication != null) {
+			SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+			securityContext.setAuthentication(authenticatedAuthentication);
+			SecurityContextHolder.setContext(securityContext);
 		}
 
-		return token.substring(7);
+		filterChain.doFilter(request, response);
 	}
 }

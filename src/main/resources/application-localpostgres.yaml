@@ -29,3 +29,8 @@ jwt:
 app:
   bootstrap:
     enabled: true
+
+api-key:
+  clients:
+    client-a: abcd
+    client-b: cdef

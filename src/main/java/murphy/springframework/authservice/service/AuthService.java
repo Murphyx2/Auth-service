@@ -19,6 +19,7 @@ import murphy.springframework.authservice.security.dto.TokenDto;
 import murphy.springframework.authservice.security.exception.ApplicationAuthenticationException;
 import murphy.springframework.authservice.security.service.jwt.JwtService;
 import murphy.springframework.authservice.security.user.AuthUser;
+import murphy.springframework.authservice.security.user.AuthUserType;
 
 @Service
 public class AuthService {
@@ -52,7 +53,7 @@ public class AuthService {
 		}
 
 		UserResponse userResponse = userCredentials.userResponse();
-		AuthUser authUser = new AuthUser(userResponse.id(), userResponse.roles());
+		AuthUser authUser = new AuthUser(userResponse.id(), userResponse.roles(), AuthUserType.INTERNAL);
 
 		String jwtToken = jwtService.createJwtToken(authUser);
 

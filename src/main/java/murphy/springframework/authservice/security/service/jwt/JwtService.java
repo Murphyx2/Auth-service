@@ -14,6 +14,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import murphy.springframework.authservice.common.Role;
 import murphy.springframework.authservice.security.exception.TokenAuthenticationException;
 import murphy.springframework.authservice.security.user.AuthUser;
+import murphy.springframework.authservice.security.user.AuthUserType;
 
 @Service
 public class JwtService {
@@ -42,7 +43,7 @@ public class JwtService {
 			String userId = decodedJWT.getSubject();
 			List<Role> roles = decodedJWT.getClaim(ROLES_CLAIM).asList(Role.class);
 
-			return new AuthUser(userId, roles);
+			return new AuthUser(userId, roles, AuthUserType.INTERNAL);
 		} catch (JWTVerificationException exception) {
 			throw new TokenAuthenticationException("JWT is not valid");
 		}

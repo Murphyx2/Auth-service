@@ -20,19 +20,25 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.AuthorizationFilter;
 
+import murphy.springframework.authservice.security.filter.ApiKeyFilter;
+import murphy.springframework.authservice.security.filter.JwtFilter;
 import murphy.springframework.authservice.security.filter.SecurityAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+	private final JwtFilter jwtFilter;
+	private final ApiKeyFilter apiKeyFilter;
 	private final SecurityAuthenticationFilter  securityAuthenticationFilter;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
 	private final AccessDeniedHandler accessDeniedHandler;
 
-	public SecurityConfig(SecurityAuthenticationFilter securityAuthenticationFilter, //
+	public SecurityConfig(JwtFilter jwtFilter, ApiKeyFilter apiKeyFilter, SecurityAuthenticationFilter securityAuthenticationFilter, //
 			AuthenticationEntryPoint authenticationEntryPoint,  //
 			AccessDeniedHandler accessDeniedHandler) {
+		this.jwtFilter = jwtFilter;
+		this.apiKeyFilter = apiKeyFilter;
 		this.securityAuthenticationFilter = securityAuthenticationFilter;
 		this.authenticationEntryPoint = authenticationEntryPoint;
 		this.accessDeniedHandler = accessDeniedHandler;
@@ -42,6 +48,8 @@ public class SecurityConfig {
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 		http.addFilterBefore(securityAuthenticationFilter, AuthorizationFilter.class)
+				.addFilterBefore(jwtFilter, SecurityAuthenticationFilter.class)
+				.addFilterBefore(apiKeyFilter, JwtFilter.class)
 				.authorizeHttpRequests(
 						matcher ->
 								matcher

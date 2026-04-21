@@ -7,8 +7,8 @@ services:
     restart: always
     environment:
       POSTGRES_DB: auth-db
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     ports:
       - "5433:5432"
     volumes:

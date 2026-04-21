@@ -2,9 +2,9 @@ spring:
   application:
     name: Auth-service
   datasource:
-    url: jdbc:postgresql://localhost:5433/auth-db
-    username: myuser
-    password: mypassword
+    url: "${DB_URL}"
+    username: "${DB_USER}"
+    password: "${DB_PASSWORD}"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -20,16 +20,17 @@ spring:
     console:
       enabled: false
 server:
-  port: 9000
+  port: "${APP_PORT}"
 
 # The string should be longer, and It shouldn't be written here, this is just for dev purposes
 jwt:
-  signing-secret: secret
+  signing-secret: "${SIGNING_SECRET}"
 
 app:
   bootstrap:
-    enabled: true
+    enabled: "${APP_BOOTSTRAP_ENABLED}"
 
+# Only here for development or testing purposes, I will be removed in a future tickets.
 api-key:
   clients:
     client-a: abcd

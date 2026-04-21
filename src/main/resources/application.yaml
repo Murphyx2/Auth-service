@@ -3,11 +3,11 @@ spring:
     name: Auth-service
   security:
     user:
-      name: user
-      password: password  # Demo credentials (replace in production)
+      name: "${DB_USER}"
+      password: "${DB_PASSWORD}"  # Demo credentials (replace in production)
 server:
-  port: 9000
+  port: "${APP_PORT}"
 
 # The string should be longer, and It shouldn't be written here, this is just for dev purposes
 jwt:
-  signing-secret: secret
+  signing-secret: "${SIGNING_SECRET}"

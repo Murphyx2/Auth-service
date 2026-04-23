@@ -1,34 +1,25 @@
 package murphy.springframework.authservice.security.provider;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-import murphy.springframework.authservice.common.Role;
 import murphy.springframework.authservice.config.properties.ApiKeyClientsProperties;
+import murphy.springframework.authservice.repository.ApiKeyRepository;
 import murphy.springframework.authservice.security.authentication.ApiKeyAuthentication;
-import murphy.springframework.authservice.security.user.AuthUser;
-import murphy.springframework.authservice.security.user.AuthUserType;
+import murphy.springframework.authservice.security.service.apikey.ApikeyService;
 import org.jspecify.annotations.Nullable;
 
 @Component
 public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
 
-	private final Map<String, String> apiKeysToClientIds;
+	private final ApikeyService apikeyService;
+	private final ApiKeyRepository apiKeyRepository;
 
-	public ApiKeyAuthenticationProvider(ApiKeyClientsProperties apiKeyClientsProperties) { //
-		this.apiKeysToClientIds = apiKeyClientsProperties.getClients() //
-				.entrySet().stream() //
-				.collect(Collectors.toMap( //
-						Map.Entry::getValue, Map.Entry::getKey, (oldValue, newValue) -> oldValue //
-				));
+	public ApiKeyAuthenticationProvider(ApiKeyClientsProperties apiKeyClientsProperties, ApikeyService apikeyService, ApiKeyRepository apiKeyRepository) {
+		this.apikeyService = apikeyService; //
+		this.apiKeyRepository = apiKeyRepository;
 	}
 
 	@Override
@@ -38,13 +29,7 @@ public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
 
 		String apiKey = apiKeyAuthentication.apiKey();
 
-		if(!apiKeysToClientIds.containsKey(apiKey)) {
-			throw new BadCredentialsException("Invalid api key");
-		}
-
-		String clientId = apiKeysToClientIds.get(apiKey);
-		AuthUser authUser = new AuthUser(clientId, List.of(Role.ROLE_ADMIN), AuthUserType.APPLICATION);
-		return ApiKeyAuthentication.authenticated(authUser);
+		return ApiKeyAuthentication.authenticated(apikeyService.resolveApiKey(apiKey));
 	}
 
 	@Override

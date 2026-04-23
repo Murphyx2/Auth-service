@@ -33,15 +33,17 @@ public class SecurityConfig {
 	private final SecurityAuthenticationFilter  securityAuthenticationFilter;
 	private final AuthenticationEntryPoint authenticationEntryPoint;
 	private final AccessDeniedHandler accessDeniedHandler;
+	private final PasswordEncoder passwordEncoder;
 
 	public SecurityConfig(JwtFilter jwtFilter, ApiKeyFilter apiKeyFilter, SecurityAuthenticationFilter securityAuthenticationFilter, //
 			AuthenticationEntryPoint authenticationEntryPoint,  //
-			AccessDeniedHandler accessDeniedHandler) {
+			AccessDeniedHandler accessDeniedHandler, PasswordEncoder passwordEncoder) {
 		this.jwtFilter = jwtFilter;
 		this.apiKeyFilter = apiKeyFilter;
 		this.securityAuthenticationFilter = securityAuthenticationFilter;
 		this.authenticationEntryPoint = authenticationEntryPoint;
 		this.accessDeniedHandler = accessDeniedHandler;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Bean
@@ -81,14 +83,10 @@ public class SecurityConfig {
 	public UserDetailsService userDetailsService() {
 		UserDetails userDetails = User
 				.withUsername("user") //
-				.password(this.encoder().encode("password")) //
+				.password(passwordEncoder.encode("password")) //
 				.roles("ADMIN") //
 				.build();
 		return new InMemoryUserDetailsManager(userDetails);
 	}
 
-	@Bean
-	public PasswordEncoder encoder() {
-		return new BCryptPasswordEncoder();
-	}
 }

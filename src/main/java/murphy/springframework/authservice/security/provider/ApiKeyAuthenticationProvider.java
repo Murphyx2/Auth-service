@@ -15,11 +15,9 @@ import org.jspecify.annotations.Nullable;
 public class ApiKeyAuthenticationProvider implements AuthenticationProvider {
 
 	private final ApikeyService apikeyService;
-	private final ApiKeyRepository apiKeyRepository;
 
-	public ApiKeyAuthenticationProvider(ApiKeyClientsProperties apiKeyClientsProperties, ApikeyService apikeyService, ApiKeyRepository apiKeyRepository) {
+	public ApiKeyAuthenticationProvider(ApikeyService apikeyService) {
 		this.apikeyService = apikeyService; //
-		this.apiKeyRepository = apiKeyRepository;
 	}
 
 	@Override

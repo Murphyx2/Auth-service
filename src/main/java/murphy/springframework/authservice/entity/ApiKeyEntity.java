@@ -55,6 +55,7 @@ public class ApiKeyEntity {
 	@Enumerated(EnumType.STRING)
 	@ElementCollection(fetch = FetchType.EAGER)
 	@CollectionTable(name = "api_keys_scope", joinColumns = @JoinColumn(name = "api_keys_id"))
+	@Column(name = "api_key_scope")
 	private Set<ApiKeyScope> scopes = new HashSet<>();
 
 	private Integer rateLimit;
@@ -65,19 +66,16 @@ public class ApiKeyEntity {
 	@Column(nullable = false, updatable = false)
 	private Instant updatedAt;
 
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false, updatable = false, name = "expired_at")
 	private Instant expireAt;
 
-	@Column(nullable = false, updatable = false)
+	@Column
 	private Instant revokedAt;
 
 	private String revokedReason;
 
 	@Column(nullable = false, updatable = false)
 	private Instant lastUsedAt;
-
-	@Column(nullable = false, updatable = false)
-	private Instant lastUpdatedAt;
 
 	@Column(nullable = false, updatable = false)
 	private UUID createdBy;
@@ -90,6 +88,7 @@ public class ApiKeyEntity {
 	public void onPrePersist() {
 		this.createdAt = Instant.now();
 		this.updatedAt = Instant.now();
+		this.lastUsedAt =  Instant.now();
 	}
 
 	@PreUpdate

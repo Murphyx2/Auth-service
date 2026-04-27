@@ -84,6 +84,10 @@ public class ApiKeyEntity {
 		this.scopes.add(scope);
 	}
 
+	public void addScope(Set<ApiKeyScope> scopes) {
+		this.scopes.addAll(scopes);
+	}
+
 	@PrePersist
 	public void onPrePersist() {
 		this.createdAt = Instant.now();

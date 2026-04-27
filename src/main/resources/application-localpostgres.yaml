@@ -37,3 +37,4 @@ api-key:
     client-b: cdef
   prefix-length: "${API_PREFIX_LENGHT}"
   expired-at-seconds: "${EXPIRED_AT_SECONDS}"
+  rate-limit: "${API_KEY_RATE_LIMIT}"

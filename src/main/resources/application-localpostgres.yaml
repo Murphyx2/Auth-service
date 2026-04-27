@@ -35,3 +35,5 @@ api-key:
   clients:
     client-a: abcd
     client-b: cdef
+  prefix-length: "${API_PREFIX_LENGHT}"
+  expired-at-seconds: "${EXPIRED_AT_SECONDS}"

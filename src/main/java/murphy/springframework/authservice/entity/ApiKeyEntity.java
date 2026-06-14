@@ -81,7 +81,17 @@ public class ApiKeyEntity {
 	private UUID createdBy;
 
 	public void addScope(ApiKeyScope scope) {
+		if(this.scopes == null) {
+			this.scopes = new HashSet<>();
+		}
 		this.scopes.add(scope);
+	}
+
+	public void addScope(Set<ApiKeyScope> scopes) {
+		if(this.scopes == null) {
+			this.scopes = new HashSet<>();
+		}
+		this.scopes.addAll(scopes);
 	}
 
 	@PrePersist

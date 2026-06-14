@@ -24,7 +24,6 @@ import murphy.springframework.authservice.dto.apikey.ApiKeyCreateAppResponse;
 import murphy.springframework.authservice.entity.ApiKeyEntity;
 import murphy.springframework.authservice.repository.ApiKeyRepository;
 import murphy.springframework.authservice.security.service.apikey.ApikeyGeneratorUtils;
-import murphy.springframework.authservice.security.service.jwt.JwtService;
 import murphy.springframework.authservice.security.user.AuthUser;
 import murphy.springframework.authservice.security.user.AuthUserType;
 import org.junit.jupiter.api.AfterEach;
@@ -47,13 +46,6 @@ class AuthServiceTest {
 
 	@Autowired
 	AuthService authService;
-
-	@Autowired
-	JwtService jwtService;
-
-	//TODO: Mock it, instead
-	@Autowired
-	UserService userService;
 
 	ApiKeyCreateAppRequest createAppRequest;
 
@@ -82,14 +74,10 @@ class AuthServiceTest {
 	@BeforeEach
 	void setUp() {
 		// Add admin to security context
-		testUser = new AuthUser(UUID.randomUUID().toString(), List.of(Role.ROLE_ADMIN)
-				, AuthUserType.INTERNAL);
+		testUser = new AuthUser(UUID.randomUUID().toString(), List.of(Role.ROLE_ADMIN), AuthUserType.INTERNAL);
 
-		Authentication authentication = new UsernamePasswordAuthenticationToken(
-				testUser,                    // ← Your Record as principal
-				null,
-				List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-		);
+		Authentication authentication = new UsernamePasswordAuthenticationToken(testUser,                    // ← Your Record as principal
+				null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
 
 		SecurityContext context = SecurityContextHolder.createEmptyContext();
 		context.setAuthentication(authentication);
@@ -124,12 +112,8 @@ class AuthServiceTest {
 		);
 	}
 
-
-
-	//@AfterEach
+	@AfterEach
 	void tearDown() {
-		apiKeyRepository.delete(savedApiKeyEntity);
-		apiKeyRepository.deleteByAppName(testAppName);
 		SecurityContextHolder.clearContext();   // Clean up
 	}
 

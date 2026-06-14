@@ -3,6 +3,8 @@ package murphy.springframework.authservice.security.service.apikey;
 import org.springframework.beans.factory.annotation.Value;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Collections;
+import java.util.Map;
 
 import jakarta.annotation.PostConstruct;
 
@@ -37,7 +39,7 @@ public class ApikeyGeneratorUtils {
 			throw new NullPointerException("appName or apikey is null");
 		}
 		if (appName.isEmpty() || apikey.isEmpty()) {
-			throw new NullPointerException("appName or apikey is empty");
+			throw new IllegalArgumentException("appName or apikey is empty");
 		}
 
 		if(apikey.length() < prefixLength){
@@ -50,7 +52,16 @@ public class ApikeyGeneratorUtils {
 						apikey);
 	}
 
-	public static String extractApikeyPrefix(String prefixApikey){
-		return "";
+	public static Map<String, String> extractPrefixApikey(String prefixedApikey){
+
+		if(prefixedApikey == null ||  prefixedApikey.isEmpty()){
+			throw new IllegalArgumentException("prefixedApikey is null or empty");
+		}
+		try {
+			String[] splitElement = prefixedApikey.split("-");
+			return Map.of("prefix", splitElement[0], "apikey", splitElement[1]);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return Collections.emptyMap();
+		}
 	}
 }
